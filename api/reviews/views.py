@@ -24,7 +24,8 @@ class ReviewDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = ReviewSerializer
 
     def get_object(self):
-        obj = get_object_or_404(Review, title_id=self.kwargs['title_id'], id=self.kwargs['review_id'])
+        obj = get_object_or_404(Review, title_id=self.kwargs['title_id'],
+                                id=self.kwargs['review_id'])
         self.check_object_permissions(self.request, obj)
         return obj
 
@@ -46,7 +47,8 @@ class CommentDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = CommentSerializer
 
     def get_object(self):
-        obj = get_object_or_404(Comment, review__title_id=self.kwargs['title_id'], review_id=self.kwargs['review_id'],
+        obj = get_object_or_404(Comment, review__title_id=self.kwargs['title_id'],
+                                review_id=self.kwargs['review_id'],
                                 id=self.kwargs['comment_id'])
         self.check_object_permissions(self.request, obj)
         return obj
