@@ -1,9 +1,5 @@
-# This is a basic workflow to help you get started with Actions
-
 name: YAMDB_workflow
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on: [push]
 
 jobs:
@@ -49,7 +45,7 @@ jobs:
     needs: push_to_docker_hub
     steps:
     - name: executing remote ssh commands to deploy
-      uses: ishelestov/ssh-action@master
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
@@ -65,7 +61,7 @@ jobs:
     needs: deploy
     steps:
     - name: send message
-      uses: deusgaudio/telegram-action@master
+      uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
