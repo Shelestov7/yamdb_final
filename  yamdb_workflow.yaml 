@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
@@ -43,3 +43,30 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: deusgaudio/yamdb_final
           tag_with_ref: true
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: push_to_docker_hub
+    steps:
+    - name: executing remote ssh commands to deploy
+      uses: ishelestov/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        script: |
+          sudo docker-compose down
+          sudo docker-compose up -d
+          sudo docker image prune -f
+
+  send_message:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+    - name: send message
+      uses: deusgaudio/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: ${{ github.workflow }}
