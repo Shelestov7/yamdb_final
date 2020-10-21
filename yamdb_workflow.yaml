@@ -52,6 +52,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
+          sudo docker pull deusgaudio/yamdb_final:latest
           sudo docker-compose down
           sudo docker-compose up -d
           sudo docker image prune -f
