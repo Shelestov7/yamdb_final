@@ -1,9 +1,5 @@
-# This is a basic workflow to help you get started with Actions
-
 name: YAMDB_workflow
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on: [push]
 
 jobs:
@@ -12,7 +8,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
@@ -43,3 +39,32 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: deusgaudio/yamdb_final
           tag_with_ref: true
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: push_to_docker_hub
+    steps:
+    - name: executing remote ssh commands to deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        script: |
+          sudo -i
+          sudo docker pull deusgaudio/yamdb_final:latest
+          sudo docker-compose down
+          sudo docker-compose up -d
+          sudo docker image prune -f
+
+  send_message:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+    - name: send message
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: ${{ github.workflow }}
